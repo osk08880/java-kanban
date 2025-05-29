@@ -6,10 +6,11 @@ import util.TaskStatus;
 import model.Epic;
 import java.util.*;
 
-public class MethodTaskManager implements TaskManager {
+public class InMemoryTaskManager implements TaskManager {
     private Map<Integer, Task> tasks = new HashMap<>();
     private Map<Integer, Epic> epics = new HashMap<>();
     private Map<Integer, SubTask> subtasks = new HashMap<>();
+    private final List<Task> history = new ArrayList<>();
     private int nextId = 1;
 
     @Override
@@ -24,7 +25,9 @@ public class MethodTaskManager implements TaskManager {
 
     @Override
     public Task getTaskById(int id) {
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        addToHistory(task);
+        return task;
     }
 
     @Override
@@ -58,7 +61,9 @@ public class MethodTaskManager implements TaskManager {
 
     @Override
     public Epic getEpicById(int id) {
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        addToHistory(epic);
+        return epic;
     }
 
     @Override
@@ -135,7 +140,9 @@ public class MethodTaskManager implements TaskManager {
 
     @Override
     public SubTask getSubTaskById(int id) {
-        return subtasks.get(id);
+        SubTask subTask = subtasks.get(id);
+        addToHistory(subTask);
+        return subTask;
     }
 
     @Override
@@ -184,6 +191,19 @@ public class MethodTaskManager implements TaskManager {
             }
         }
         return epicSubTasks;
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return new ArrayList<>(history); // 🔹 Возвращаем копию истории
+    }
+
+    private void addToHistory(Task task) {
+        if (task == null) return;
+        if (history.size() >= 10) {
+            history.remove(0);
+        }
+        history.add(task);
     }
 }
 
