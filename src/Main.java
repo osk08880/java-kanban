@@ -1,4 +1,5 @@
-import manager.MethodTaskManager;
+import manager.InMemoryTaskManager;
+import manager.Managers;
 import manager.TaskManager;
 import model.Epic;
 import model.SubTask;
@@ -8,7 +9,7 @@ import util.TaskStatus;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager manager = new MethodTaskManager();
+        TaskManager manager = Managers.getDefault();
 
         Task task1 = new Task(0, "Задача №1", "Описание", TaskStatus.NEW);
         Task task2 = new Task(0, "Задача №2", "Описание", TaskStatus.NEW);
@@ -17,6 +18,7 @@ public class Main {
 
         Epic epic1 = new Epic(0, "Эпик №1", "Две подзадачи", TaskStatus.NEW);
         manager.createEpic(epic1);
+
         SubTask subTask1 = new SubTask(0, "Подзадача №1", "К эпик №1", TaskStatus.NEW, epic1.getId());
         SubTask subTask2 = new SubTask(0, "Подзадача №2", "К эпик №1", TaskStatus.NEW, epic1.getId());
         manager.createSubTask(subTask1);
