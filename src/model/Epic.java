@@ -21,6 +21,9 @@ public class Epic extends Task {
     }
 
     public void addSubTaskId(int id) {
+        if (id == getId()) {
+            throw new IllegalArgumentException("Epic нельзя добавить в самого себя в виде подзадачи");
+        }
         subtaskIds.add(id);
     }
 
@@ -30,15 +33,12 @@ public class Epic extends Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Epic epic)) return false;
-        if (!super.equals(o)) return false;
-        return Objects.equals(subtaskIds, epic.subtaskIds);
+        return super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subtaskIds);
+        return super.hashCode();
     }
 
     @Override
@@ -48,6 +48,7 @@ public class Epic extends Task {
                 ", title='" + getTitle() + '\'' +
                 ", details='" + getDetails() + '\'' +
                 ", status=" + getStatus() +
+                ", viewed=" + isViewed() +
                 ", subtaskIds=" + subtaskIds +
                 '}';
     }

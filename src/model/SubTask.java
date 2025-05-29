@@ -8,6 +8,9 @@ public class SubTask extends Task {
 
     public SubTask(int id, String title, String details, TaskStatus status, int epicId) {
         super(id, title, details, status);
+        if (id == epicId) {
+            throw new IllegalArgumentException("SubTask не может быть своим же эпиком");
+        }
         this.epicId = epicId;
     }
 
@@ -17,15 +20,12 @@ public class SubTask extends Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SubTask subTask)) return false;
-        if (!super.equals(o)) return false;
-        return epicId == subTask.epicId;
+        return super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), epicId);
+        return super.hashCode();
     }
 
     @Override
@@ -35,6 +35,7 @@ public class SubTask extends Task {
                 ", title='" + getTitle() + '\'' +
                 ", details='" + getDetails() + '\'' +
                 ", status=" + getStatus() +
+                ", viewed=" + isViewed() +
                 ", epicId=" + epicId +
                 '}';
     }

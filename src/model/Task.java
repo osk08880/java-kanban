@@ -8,6 +8,7 @@ public class Task {
     private String title;
     private String details;
     private TaskStatus status;
+    private boolean viewed = false;
 
     public Task(int id, String title, String details, TaskStatus status) {
         this.title = title;
@@ -51,17 +52,22 @@ public class Task {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Task)) return false;
         Task task = (Task) o;
-        return id == task.id &&
-                Objects.equals(title, task.title) &&
-                Objects.equals(details, task.details) &&
-                status == task.status;
+        return id == task.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, details, status);
+        return Integer.hashCode(id);
+    }
+
+    public boolean isViewed() {
+        return viewed;
+    }
+
+    public void setViewed(boolean viewed) {
+        this.viewed = viewed;
     }
 
     @Override
@@ -71,6 +77,7 @@ public class Task {
                 ", title='" + title + '\'' +
                 ", details='" + details + '\'' +
                 ", status=" + status +
+                ", viewed=" + viewed +
                 '}';
     }
 }
