@@ -8,13 +8,14 @@ public class Task {
     private String title;
     private String details;
     private TaskStatus status;
-    private boolean viewed = false;
+    private boolean viewed;
 
     public Task(int id, String title, String details, TaskStatus status) {
         this.title = title;
         this.id = id;
         this.details = details;
         this.status = status;
+        this.viewed = false;
     }
 
     public int getId() {
