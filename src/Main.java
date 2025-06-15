@@ -1,4 +1,3 @@
-import manager.InMemoryTaskManager;
 import manager.Managers;
 import manager.TaskManager;
 import model.Epic;
@@ -16,46 +15,56 @@ public class Main {
         manager.createTask(task1);
         manager.createTask(task2);
 
-        Epic epic1 = new Epic(0, "Эпик №1", "Две подзадачи", TaskStatus.NEW);
-        Epic epic2 = new Epic(0, "Эпик №2", "Одна подзадача", TaskStatus.NEW);
+        Epic epic1 = new Epic(0, "Эпик №1", "Три подзадачи", TaskStatus.NEW);
+        Epic epic2 = new Epic(0, "Эпик №2", "Без подзадач", TaskStatus.NEW);
         manager.createEpic(epic1);
         manager.createEpic(epic2);
 
         SubTask subTask1 = new SubTask(0, "Подзадача №1", "К эпик №1", TaskStatus.NEW, epic1.getId());
         SubTask subTask2 = new SubTask(0, "Подзадача №2", "К эпик №1", TaskStatus.NEW, epic1.getId());
+        SubTask subTask3 = new SubTask(0, "Подзадача №3", "К эпик №1", TaskStatus.NEW, epic1.getId());
         manager.createSubTask(subTask1);
         manager.createSubTask(subTask2);
+        manager.createSubTask(subTask3);
 
+        manager.getSubTaskById(subTask2.getId());
         manager.getTaskById(task1.getId());
         manager.getTaskById(task2.getId());
-
-        manager.getEpicById(epic1.getId());
         manager.getEpicById(epic2.getId());
-
+        manager.getSubTaskById(subTask3.getId());
+        manager.getEpicById(epic1.getId());
         manager.getSubTaskById(subTask1.getId());
-        manager.getSubTaskById(subTask2.getId());
 
-        System.out.println("== Начальное состояние ==");
-        printAll(manager);
+        System.out.println("Запрос Эпик №2");
+        manager.getEpicById(epic2.getId());
         printHistory(manager);
 
-        task1.setStatus(TaskStatus.DONE);
-        manager.updateTask(task1);
-        subTask1.setStatus(TaskStatus.IN_PROGRESS);
-        subTask2.setStatus(TaskStatus.DONE);
-        manager.updateSubTask(subTask1);
-        manager.updateSubTask(subTask2);
-
-
-        System.out.println("\n== После обновления статусов ==");
-        printAll(manager);
+        System.out.println("Запрос Задачи №1");
+        manager.getTaskById(task1.getId());
         printHistory(manager);
 
+        System.out.println("Запрос Подзадачи №3");
+        manager.getSubTaskById(subTask3.getId());
+        printHistory(manager);
+
+        System.out.println("Запрос Подзадачи №1");
+        manager.getSubTaskById(subTask1.getId());
+        printHistory(manager);
+
+        System.out.println("Повторный запрос Эпик №2");
+        manager.getEpicById(epic2.getId());
+        printHistory(manager);
+
+        System.out.println("Повторный запрос Подзадачи №1");
+        manager.getSubTaskById(subTask1.getId());
+        printHistory(manager);
+
+        System.out.println("\nУдаляем Задачу №2 (id=" + task2.getId() + ")");
         manager.deleteTaskById(task2.getId());
-        manager.deleteEpicById(epic2.getId());
+        printHistory(manager);
 
-        System.out.println("\n== После удаления задачи и эпика ==");
-        printAll(manager);
+        System.out.println("\nУдаляем эпик Эпик №1 (id=" + epic1.getId() + ") с подзадачами");
+        manager.deleteEpicById(epic1.getId());
         printHistory(manager);
     }
 
