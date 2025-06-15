@@ -5,32 +5,91 @@ import model.SubTask;
 import model.Task;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final LinkedList<Task> history = new LinkedList<>();
-    private static final int MAX_HISTORY_SIZE = 10;
+
+    private static class Node {
+        Task task;
+        Node prev;
+        Node next;
+
+        Node(Node prev, Task task, Node next) {
+            this.prev = prev;
+            this.task = task;
+            this.next = next;
+        }
+    }
+
+    private Node head;
+    private Node tail;
+    private final Map<Integer, Node> nodeMap = new HashMap<>();
 
     @Override
     public void add(Task task) {
         if (task == null) return;
-        Task copy = copyOf(task);  // создаём копию
+        remove(task.getId());
+        Task copy = copyOf(task);
         copy.setViewed(true);
-        history.add(copy);
-        if (history.size() > MAX_HISTORY_SIZE) {
-            history.removeFirst();
-        }
+        linkLast(copy);
     }
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(history);
+        List<Task> result = new ArrayList<>();
+        Node current = head;
+        while (current != null) {
+            result.add(copyOf(current.task));
+            current = current.next;
+        }
+        return result;
+    }
+
+    public void remove(int id) {
+        Node node = nodeMap.remove(id);
+        if (node != null) {
+            removeNode(node);
+        }
+    }
+
+    private void linkLast(Task task) {
+        Node newNode = new Node(tail, task, null);
+        if (tail != null) {
+            tail.next = newNode;
+        } else {
+            head = newNode;
+        }
+        tail = newNode;
+        nodeMap.put(task.getId(), newNode);
+    }
+
+    private void  removeNode(Node node) {
+        Node prev = node.prev;
+        Node next = node.next;
+
+        if (prev != null) {
+            prev.next = next;
+        } else {
+            head = next;
+        }
+
+        if (next != null) {
+            next.prev = prev;
+        } else {
+            tail = prev;
+        }
+
+        node.prev = null;
+        node.next = null;
+        node.task = null;
     }
 
     private Task copyOf(Task task) {
+        Task copy;
         if (task instanceof SubTask subTask) {
-            return new SubTask(
+            copy = new SubTask(
                     subTask.getId(),
                     subTask.getTitle(),
                     subTask.getDetails(),
@@ -45,14 +104,16 @@ public class InMemoryHistoryManager implements HistoryManager {
                     epic.getStatus()
             );
             copyEpic.setSubTaskIds(new ArrayList<>(epic.getSubTaskIds())); // копия списка
-            return copyEpic;
+            copy = copyEpic;
         } else {
-            return new Task(
+            copy = new Task(
                     task.getId(),
                     task.getTitle(),
                     task.getDetails(),
                     task.getStatus()
             );
         }
+        copy.setViewed(task.isViewed());
+        return copy;
     }
 }
