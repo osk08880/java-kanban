@@ -15,4 +15,11 @@ class ManagersTest {
         HistoryManager historyManager = Managers.getDefaultHistory();
         assertNotNull(historyManager, "HistoryManager не должен быть null");
     }
+
+    @Test
+    void getDefaultReturnsNewInstanceEachTime() {
+        TaskManager first = Managers.getDefault();
+        TaskManager second = Managers.getDefault();
+        assertNotSame(first, second, "getDefault должен возвращать новый объект при каждом вызове");
+    }
 }
