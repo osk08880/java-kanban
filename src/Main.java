@@ -84,6 +84,7 @@ public class Main {
             System.out.println(SubTask);
         }
     }
+
     private static void printHistory(TaskManager manager) {
         System.out.println("\n-- История просмотров --");
         for (Task task : manager.getHistory()) {

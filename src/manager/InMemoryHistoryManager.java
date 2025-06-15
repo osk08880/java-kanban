@@ -65,7 +65,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         nodeMap.put(task.getId(), newNode);
     }
 
-    private void  removeNode(Node node) {
+    private void removeNode(Node node) {
         Node prev = node.prev;
         Node next = node.next;
 
