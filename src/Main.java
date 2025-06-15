@@ -80,8 +80,8 @@ public class Main {
         }
 
         System.out.println("-- Подзадачи --");
-        for (SubTask SubTask : manager.getAllSubTasks()) {
-            System.out.println(SubTask);
+        for (SubTask subTask : manager.getAllSubTasks()) {
+            System.out.println(subTask);
         }
     }
 
