@@ -11,18 +11,6 @@ import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private static class Node {
-        Task task;
-        Node prev;
-        Node next;
-
-        Node(Node prev, Task task, Node next) {
-            this.prev = prev;
-            this.task = task;
-            this.next = next;
-        }
-    }
-
     private Node head;
     private Node tail;
     private final Map<Integer, Node> nodeMap = new HashMap<>();
@@ -41,8 +29,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         List<Task> result = new ArrayList<>();
         Node current = head;
         while (current != null) {
-            result.add(copyOf(current.task));
-            current = current.next;
+            result.add(copyOf(current.getTask()));
+            current = current.getNext();
         }
         return result;
     }
@@ -57,7 +45,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private void linkLast(Task task) {
         Node newNode = new Node(tail, task, null);
         if (tail != null) {
-            tail.next = newNode;
+            tail.setNext(newNode);
         } else {
             head = newNode;
         }
@@ -66,24 +54,24 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void removeNode(Node node) {
-        Node prev = node.prev;
-        Node next = node.next;
+        Node prev = node.getPrev();
+        Node next = node.getNext();
 
         if (prev != null) {
-            prev.next = next;
+            prev.setNext(next);
         } else {
             head = next;
         }
 
         if (next != null) {
-            next.prev = prev;
+            next.setPrev(prev);
         } else {
             tail = prev;
         }
 
-        node.prev = null;
-        node.next = null;
-        node.task = null;
+        node.setPrev(null);
+        node.setNext(null);
+        node.setTask(null);
     }
 
     private Task copyOf(Task task) {
