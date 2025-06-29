@@ -1,6 +1,5 @@
 package model;
 
-import java.util.Objects;
 import util.TaskStatus;
 
 public class Task {
@@ -73,13 +72,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", details='" + details + '\'' +
-                ", status=" + status +
-                ", viewed=" + viewed +
-                '}';
+        return "Task{" + "id=" + id + ", title='" + title + '\'' + ", details='" + details + '\'' + ", status=" + status + ", viewed=" + viewed + '}';
     }
 }
 

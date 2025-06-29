@@ -2,6 +2,7 @@ package model;
 
 import org.junit.jupiter.api.Test;
 import util.TaskStatus;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EpicTest {
@@ -21,6 +22,7 @@ class EpicTest {
 
         assertNotEquals(epic, subTask, "Epic и SubTask с разными id не должны быть равны");
     }
+
     @Test
     public void shouldNotAllowSelfAsSubtask() {
         Epic epic = new Epic(10, "Epic", "Details", TaskStatus.NEW);

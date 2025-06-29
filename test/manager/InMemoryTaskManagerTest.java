@@ -5,6 +5,7 @@ import model.Epic;
 import model.SubTask;
 import util.TaskStatus;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
@@ -90,5 +91,26 @@ class InMemoryTaskManagerTest {
         assertTrue(originalEpic.getId() != 0, "Id должен быть установлен менеджером (не 0)");
 
         assertTrue(originalEpic.getSubTaskIds().isEmpty(), "Список подзадач должен остаться пустым");
+    }
+
+    @Test
+    void deletingSubTaskRemovesFromEpicAndHistory() {
+        HistoryManager history = new InMemoryHistoryManager();
+        InMemoryTaskManager manager = new InMemoryTaskManager(history);
+
+        Epic epic = new Epic(0, "EpicTest", "EpicDetails", TaskStatus.NEW);
+        manager.createEpic(epic);
+
+        SubTask subTask = new SubTask(0, "SubTest", "SubDetails", TaskStatus.NEW, epic.getId());
+        manager.createSubTask(subTask);
+
+        assertTrue(epic.getSubTaskIds().contains(subTask.getId()));
+
+        manager.deleteSubTaskById(subTask.getId());
+
+        Epic updatedEpic = manager.getEpicById(epic.getId());
+        assertFalse(updatedEpic.getSubTaskIds().contains(subTask.getId()), "Подзадача должна быть удалена");
+        assertNull(manager.getSubTaskById(subTask.getId()), "Подзадача должна отсутствовать в менеджере");
+        assertFalse(manager.getHistory().contains(subTask), "Подзадача должна быть удалена из истории");
     }
 }
