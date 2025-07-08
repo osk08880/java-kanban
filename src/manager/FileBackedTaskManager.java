@@ -51,6 +51,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case TASK -> manager.createTask(task);
                     case EPIC -> manager.createEpic((Epic) task);
                     case SUBTASK -> manager.createSubTask((SubTask) task);
+                    default -> throw new IllegalStateException("Неизвестный тип задачи: " + task.getType());
                 }
             }
         } catch (IOException e) {

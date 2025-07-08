@@ -30,6 +30,7 @@ public class TaskConverterCsv {
             case TASK -> new Task(id, name, details, status);
             case EPIC -> new Epic(id, name, details, status);
             case SUBTASK -> new SubTask(id, name, details, status, Integer.parseInt(parts[5]));
+            default -> throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
         };
     }
 }
