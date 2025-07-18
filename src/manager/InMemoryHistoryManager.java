@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-
     private Node head;
     private Node tail;
     private final Map<Integer, Node> nodeMap = new HashMap<>();
@@ -35,6 +34,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         return result;
     }
 
+    @Override
     public void remove(int id) {
         Node node = nodeMap.remove(id);
         if (node != null) {
@@ -91,7 +91,7 @@ public class InMemoryHistoryManager implements HistoryManager {
                     epic.getDetails(),
                     epic.getStatus()
             );
-            copyEpic.setSubTaskIds(new ArrayList<>(epic.getSubTaskIds())); // копия списка
+            copyEpic.setSubTaskIds(new ArrayList<>(epic.getSubTaskIds()));
             copy = copyEpic;
         } else {
             copy = new Task(
@@ -102,6 +102,8 @@ public class InMemoryHistoryManager implements HistoryManager {
             );
         }
         copy.setViewed(task.isViewed());
+        copy.setDuration(task.getDuration());
+        copy.setStartTime(task.getStartTime());
         return copy;
     }
 }
