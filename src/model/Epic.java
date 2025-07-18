@@ -1,10 +1,11 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import util.TaskStatus;
 import util.TaskType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Epic extends Task {
     private List<Integer> subtaskIds = new ArrayList<>();
@@ -39,12 +40,15 @@ public class Epic extends Task {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
+        if (this == o) return true;
+        if (!(o instanceof Epic)) return false;
+        Epic epic = (Epic) o;
+        return getId() == epic.getId();
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(getId());
     }
 
     @Override

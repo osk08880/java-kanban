@@ -3,12 +3,18 @@ package model;
 import util.TaskStatus;
 import util.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 public class Task {
     private int id;
     private String title;
     private String details;
     private TaskStatus status;
     private boolean viewed;
+    private Duration duration;
+    private LocalDateTime startTime;
 
     public Task(int id, String title, String details, TaskStatus status) {
         this.title = title;
@@ -54,6 +60,39 @@ public class Task {
         return TaskType.TASK;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime != null && duration != null ? startTime.plus(duration) : null;
+    }
+
+    public boolean intersects(Task other) {
+        if (this.startTime == null || other.getStartTime() == null || this.duration == null || other.getDuration() == null) {
+            return false;
+        }
+        LocalDateTime thisStart = this.startTime;
+        LocalDateTime thisEnd = this.getEndTime();
+        LocalDateTime otherStart = other.getStartTime();
+        LocalDateTime otherEnd = other.getEndTime();
+        return thisStart.isBefore(otherEnd) && otherStart.isBefore(thisEnd) &&
+                !(thisStart.equals(otherEnd) || otherStart.equals(thisEnd));
+    }
+
+    // В классе Task
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,7 +103,7 @@ public class Task {
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(id);
+        return Objects.hash(id);
     }
 
     public boolean isViewed() {
