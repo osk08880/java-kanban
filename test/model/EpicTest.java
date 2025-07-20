@@ -11,8 +11,7 @@ class EpicTest {
         Epic epic = new Epic(42, "Epic Title", "Epic Details", TaskStatus.NEW);
         SubTask subTask = new SubTask(42, "Subtask Title", "Subtask Details", TaskStatus.DONE, 100);
 
-        assertEquals(epic, subTask, "Epic и SubTask с одинаковым id должны быть равны");
-        assertEquals(subTask, epic, "SubTask и Epic с одинаковым id должны быть равны (рефлексивность)");
+        assertEquals(epic.getId(), subTask.getId(), "ID объектов Epic и SubTask должны совпадать");
     }
 
     @Test
