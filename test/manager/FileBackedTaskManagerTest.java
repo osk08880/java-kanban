@@ -18,16 +18,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     @TempDir
-    File tempDir;
+    private File tempDir;
+
+    public File getTempDir() {
+        return tempDir;
+    }
 
     @Override
     protected FileBackedTaskManager createTaskManager() {
-        return new FileBackedTaskManager(new File(tempDir, "tasks.csv"), new InMemoryHistoryManager());
+        return new FileBackedTaskManager(new File(getTempDir(), "tasks.csv"), new InMemoryHistoryManager());
     }
 
     @Test
     void testSaveAndLoadEmptyManager() throws IOException {
-        File file = new File(tempDir, "empty.csv");
+        File file = new File(getTempDir(), "empty.csv");
         FileBackedTaskManager manager = new FileBackedTaskManager(file, new InMemoryHistoryManager());
         manager.save();
 
@@ -40,7 +44,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Test
     void testSaveAndLoadTasksWithTime() throws IOException {
-        File file = new File(tempDir, "tasks.csv");
+        File file = new File(getTempDir(), "tasks.csv");
         FileBackedTaskManager manager = new FileBackedTaskManager(file, new InMemoryHistoryManager());
 
         Task task = new Task(0, "Task", "Details", TaskStatus.NEW);
@@ -103,14 +107,14 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Test
     void testLoadFromNonExistentFile() {
-        File file = new File(tempDir, "nonexistent.csv");
+        File file = new File(getTempDir(), "nonexistent.csv");
         assertThrows(RuntimeException.class, () -> FileBackedTaskManager.loadFromFile(file, new InMemoryHistoryManager()),
                 "Должно выбросить исключение при загрузке из несуществующего файла");
     }
 
     @Test
     void testGetEpicStartTimeDurationAndEndTime() throws IOException {
-        File file = new File(tempDir, "tasks.csv");
+        File file = new File(getTempDir(), "tasks.csv");
         FileBackedTaskManager manager = new FileBackedTaskManager(file, new InMemoryHistoryManager());
 
         Epic epic = new Epic(0, "Epic", "Details", TaskStatus.NEW);
@@ -134,7 +138,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Test
     void testSaveAndLoadHistory() throws IOException {
-        File file = new File(tempDir, "tasks.csv");
+        File file = new File(getTempDir(), "tasks.csv");
         FileBackedTaskManager manager = new FileBackedTaskManager(file, new InMemoryHistoryManager());
 
         Task task = new Task(0, "Task", "Details", TaskStatus.NEW);
