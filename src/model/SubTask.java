@@ -3,6 +3,8 @@ package model;
 import util.TaskStatus;
 import util.TaskType;
 
+import java.util.Objects;
+
 public class SubTask extends Task {
     private int epicId;
 
@@ -25,12 +27,15 @@ public class SubTask extends Task {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
+        if (this == o) return true;
+        if (!(o instanceof SubTask)) return false;
+        SubTask subTask = (SubTask) o;
+        return getId() == subTask.getId();
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(getId());
     }
 
     @Override
