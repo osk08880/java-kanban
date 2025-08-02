@@ -47,12 +47,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Optional<Task> getTaskById(int id) {
+    public Task getTaskById(int id) throws NotFoundException {
         Task task = tasks.get(id);
-        if (task != null) {
-            historyManager.add(task);
+        if (task == null) {
+            throw new NotFoundException("Задача с ID " + id + " не найдена");
         }
-        return Optional.ofNullable(task);
+        historyManager.add(task);
+        return task;
     }
 
     @Override
@@ -97,6 +98,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public Optional<Task> findTaskById(int id) {
+        return Optional.ofNullable(tasks.get(id))
+                .map(task -> {
+                    historyManager.add(task);
+                    return task;
+                });
+    }
+
+    @Override
     public List<Epic> getAllEpics() {
         return new ArrayList<>(epics.values());
     }
@@ -117,12 +127,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Optional<Epic> getEpicById(int id) {
+    public Epic getEpicById(int id) throws NotFoundException {
         Epic epic = epics.get(id);
-        if (epic != null) {
-            historyManager.add(epic);
+        if (epic == null) {
+            throw new NotFoundException("Эпик с ID " + id + " не найден");
         }
-        return Optional.ofNullable(epic);
+        historyManager.add(epic);
+        return epic;
     }
 
     @Override
@@ -155,6 +166,16 @@ public class InMemoryTaskManager implements TaskManager {
             });
             historyManager.remove(id);
         }
+    }
+
+    @Override
+    public Optional<Epic> findEpicById(int id) {
+        Epic epic = epics.get(id);
+        if (epic != null) {
+            historyManager.add(epic);
+            return Optional.of(epic);
+        }
+        return Optional.empty();
     }
 
     private void updateEpicStatus(int epicId) {
@@ -206,12 +227,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Optional<SubTask> getSubTaskById(int id) {
+    public SubTask getSubTaskById(int id) throws NotFoundException {
         SubTask subTask = subtasks.get(id);
-        if (subTask != null) {
-            historyManager.add(subTask);
+        if (subTask == null) {
+            throw new NotFoundException("Подзадача с ID " + id + " не найдена");
         }
-        return Optional.ofNullable(subTask);
+        historyManager.add(subTask);
+        return subTask;
     }
 
     @Override
@@ -292,7 +314,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public Optional<SubTask> findSubTaskById(int id) {
+        SubTask subtask = subtasks.get(id);
+        if (subtask != null) {
+            historyManager.add(subtask);
+            return Optional.of(subtask);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public List<Task> getHistory() {
+        System.out.println("Получение истории: " + historyManager.getHistory());
         return historyManager.getHistory();
     }
 
