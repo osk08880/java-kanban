@@ -92,7 +92,6 @@ public class Task {
                 !(thisStart.equals(otherEnd) || otherStart.equals(thisEnd));
     }
 
-    // В классе Task
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
