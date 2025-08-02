@@ -9,14 +9,32 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
 public interface TaskManager {
+
+    Optional<Task> findTaskById(int id);
+
+    default Task getTaskById(int id) throws NotFoundException {
+        return findTaskById(id).orElseThrow(() ->
+                new NotFoundException("Задача с id " + id + " не найдена"));
+    }
+
+    Optional<Epic> findEpicById(int id);
+
+    default Epic getEpicById(int id) throws NotFoundException {
+        return findEpicById(id).orElseThrow(() ->
+                new NotFoundException("Эпик с id " + id + " не найдена"));
+    }
+
+    Optional<SubTask> findSubTaskById(int id);
+
+    default SubTask getSubTaskById(int id) throws NotFoundException {
+        return findSubTaskById(id).orElseThrow(() ->
+                new NotFoundException("Подзадача с id " + id + " не найдена"));
+    }
 
     List<Task> getAllTasks();
 
     void deleteAllTasks();
-
-    Optional<Task> getTaskById(int id);
 
     void createTask(Task task);
 
@@ -28,8 +46,6 @@ public interface TaskManager {
 
     void deleteAllEpics();
 
-    Optional<Epic> getEpicById(int id);
-
     void createEpic(Epic epic);
 
     void updateEpic(Epic epic);
@@ -39,8 +55,6 @@ public interface TaskManager {
     List<SubTask> getAllSubTasks();
 
     void deleteAllSubTasks();
-
-    Optional<SubTask> getSubTaskById(int id);
 
     void createSubTask(SubTask subtask);
 
