@@ -9,6 +9,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -73,14 +74,14 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         assertEquals(1, loaded.getAllEpics().size(), "Должен быть 1 эпик");
         assertEquals(2, loaded.getAllSubTasks().size(), "Должно быть 2 подзадачи");
 
-        Optional<Task> loadedTaskOpt = loaded.getTaskById(task.getId());
+        Optional<Task> loadedTaskOpt = loaded.findTaskById(task.getId());
         assertTrue(loadedTaskOpt.isPresent(), "Задача должна быть найдена");
         Task loadedTask = loadedTaskOpt.get();
         assertEquals(task.getTitle(), loadedTask.getTitle(), "Название задачи должно совпадать");
         assertEquals(task.getStartTime(), loadedTask.getStartTime(), "Время начала задачи должно совпадать");
         assertEquals(task.getDuration(), loadedTask.getDuration(), "Длительность задачи должна совпадать");
 
-        Optional<Epic> loadedEpicOpt = loaded.getEpicById(epic.getId());
+        Optional<Epic> loadedEpicOpt = loaded.findEpicById(epic.getId());
         assertTrue(loadedEpicOpt.isPresent(), "Эпик должен быть найден");
         Epic loadedEpic = loadedEpicOpt.get();
         assertEquals(epic.getTitle(), loadedEpic.getTitle(), "Название эпика должно совпадать");
@@ -88,7 +89,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         assertEquals(Duration.ofHours(3), loaded.getEpicDuration(epic.getId()), "Длительность эпика должна быть суммой");
         assertEquals(subTask1.getEndTime(), loaded.getEpicEndTime(epic.getId()), "Время окончания эпика должно быть максимальным");
 
-        Optional<SubTask> loadedSub1Opt = loaded.getSubTaskById(subTask1.getId());
+        Optional<SubTask> loadedSub1Opt = loaded.findSubTaskById(subTask1.getId());
         assertTrue(loadedSub1Opt.isPresent(), "Подзадача 1 должна быть найдена");
         SubTask loadedSub1 = loadedSub1Opt.get();
         assertEquals(subTask1.getTitle(), loadedSub1.getTitle(), "Название подзадачи 1 должно совпадать");
@@ -96,7 +97,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         assertEquals(subTask1.getStartTime(), loadedSub1.getStartTime(), "Время начала подзадачи 1 должно совпадать");
         assertEquals(subTask1.getDuration(), loadedSub1.getDuration(), "Длительность подзадачи 1 должна совпадать");
 
-        Optional<SubTask> loadedSub2Opt = loaded.getSubTaskById(subTask2.getId());
+        Optional<SubTask> loadedSub2Opt = loaded.findSubTaskById(subTask2.getId());
         assertTrue(loadedSub2Opt.isPresent(), "Подзадача 2 должна быть найдена");
         SubTask loadedSub2 = loadedSub2Opt.get();
         assertEquals(subTask2.getTitle(), loadedSub2.getTitle(), "Название подзадачи 2 должно совпадать");
@@ -143,7 +144,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
         Task task = new Task(0, "Task", "Details", TaskStatus.NEW);
         manager.createTask(task);
-        Optional<Task> taskOpt = manager.getTaskById(task.getId());
+        Optional<Task> taskOpt = manager.findTaskById(task.getId());
         assertTrue(taskOpt.isPresent(), "Задача должна быть найдена");
         manager.save();
 
@@ -152,5 +153,13 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         assertEquals(1, history.size(), "История должна содержать 1 запись");
         assertEquals(task.getId(), history.get(0).getId(), "ID задачи в истории должен совпадать");
         assertEquals(task.getTitle(), history.get(0).getTitle(), "Название задачи в истории должно совпадать");
+    }
+
+    @Test
+    void testLoadFromCorruptedFile() throws IOException {
+        File file = new File(getTempDir(), "corrupted.csv");
+        Files.writeString(file.toPath(), "invalid,data,here");
+        assertThrows(RuntimeException.class, () -> FileBackedTaskManager.loadFromFile(file, new InMemoryHistoryManager()),
+                "Должно выбросить исключение при загрузке поврежденного файла");
     }
 }
