@@ -5,7 +5,6 @@ import model.SubTask;
 import model.Task;
 import util.TaskConverterCsv;
 
-
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -22,7 +21,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     protected void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("id,type,name,status,details,epic,duration,startTime\n");
+            writer.write("id,type,name,status,details,epic,duration,startTime,viewed\n");
             for (Task task : getAllTasks()) {
                 writer.write(TaskConverterCsv.toString(task) + "\n");
             }
@@ -35,7 +34,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             writer.write("\n");
             writer.write(historyToString(getHistory()));
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка сохранения в файл: " + file.getPath(), e);
+            throw new ManagerSaveException("Ошибка при сохранения в файл: " + file.getPath(), e);
         }
     }
 
@@ -43,6 +42,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager manager = new FileBackedTaskManager(file, historyManager);
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
+            if (line == null || !line.contains("type")) throw new RuntimeException("Некорректный формат файла");
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
                 try {
                     Task task = TaskConverterCsv.fromString(line);
@@ -53,18 +53,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                 } catch (IllegalArgumentException e) {
                     System.err.println("Ошибка при обработке строки: " + line + ". Причина: " + e.getMessage());
+                    continue;
                 }
             }
             line = reader.readLine();
             if (line != null && !line.isEmpty()) {
                 for (int id : historyFromString(line)) {
-                    if (manager.tasks.containsKey(id)) {
-                        manager.getTaskById(id);
-                    } else if (manager.epics.containsKey(id)) {
-                        manager.getEpicById(id);
-                    } else if (manager.subtasks.containsKey(id)) {
-                        manager.getSubTaskById(id);
+                    Optional<Task> taskOpt = manager.findTaskById(id);
+                    if (taskOpt.isEmpty()) {
+                        Optional<Epic> epicOpt = manager.findEpicById(id);
+                        taskOpt = epicOpt.map(epic -> (Task) epic);
                     }
+                    if (taskOpt.isEmpty()) {
+                        Optional<SubTask> subTaskOpt = manager.findSubTaskById(id);
+                        taskOpt = subTaskOpt.map(subTask -> (Task) subTask);
+                    }
+                    taskOpt.ifPresent(manager.historyManager::add);
                 }
             }
             int maxId = Math.max(
@@ -169,30 +173,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Optional<Task> getTaskById(int id) {
-        Optional<Task> taskOpt = super.getTaskById(id);
-        if (taskOpt.isPresent()) {
-            save();
-        }
-        return taskOpt;
+    public Task getTaskById(int id) throws NotFoundException {
+        Task task = super.getTaskById(id);
+        save();
+        return task;
     }
 
     @Override
-    public Optional<Epic> getEpicById(int id) {
-        Optional<Epic> epicOpt = super.getEpicById(id);
-        if (epicOpt.isPresent()) {
-            save();
-        }
-        return epicOpt;
+    public Epic getEpicById(int id) throws NotFoundException {
+        Epic epic = super.getEpicById(id);
+        save();
+        return epic;
     }
 
     @Override
-    public Optional<SubTask> getSubTaskById(int id) {
-        Optional<SubTask> subTaskOpt = super.getSubTaskById(id);
-        if (subTaskOpt.isPresent()) {
-            save();
-        }
-        return subTaskOpt;
+    public SubTask getSubTaskById(int id) throws NotFoundException {
+        SubTask subTask = super.getSubTaskById(id);
+        save();
+        return subTask;
     }
 
     @Override
@@ -230,6 +228,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 .filter(Objects::nonNull)
                 .map(SubTask::getDuration)
                 .filter(Objects::nonNull)
-                .reduce(Duration.ZERO, Duration::plus, Duration::plus);
+                .reduce(Duration.ZERO, Duration::plus);
     }
 }

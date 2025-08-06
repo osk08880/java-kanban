@@ -16,7 +16,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        if (task == null) return;
+        if (task == null) {
+            System.err.println("Попытка добавить null задачу в историю");
+            return;
+        }
+        System.out.println("Добавление задачи в историю: ID = " + task.getId() + ", Title = " + task.getTitle());
         remove(task.getId());
         Task copy = copyOf(task);
         copy.setViewed(true);
@@ -28,9 +32,15 @@ public class InMemoryHistoryManager implements HistoryManager {
         List<Task> result = new ArrayList<>();
         Node current = head;
         while (current != null) {
-            result.add(copyOf(current.getTask()));
+            Task task = current.getTask();
+            if (task != null) {
+                result.add(copyOf(task));
+            } else {
+                System.err.println("Обнаружен null-узел в истории");
+            }
             current = current.getNext();
         }
+        System.out.println("История: " + result);
         return result;
     }
 
@@ -38,6 +48,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void remove(int id) {
         Node node = nodeMap.remove(id);
         if (node != null) {
+            System.out.println("Удаление задачи из истории: ID = " + id);
             removeNode(node);
         }
     }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,5 +31,15 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         task2.setStartTime(LocalDateTime.of(2025, 7, 16, 11, 0));
         task2.setDuration(Duration.ofHours(1));
         assertFalse(manager.hasIntersection(task2), "Задачи не должны пересекаться");
+    }
+
+    @Test
+    public void testAddAndGetHistory() {
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+        Task task = new Task(1, "Test task", "details", TaskStatus.NEW);
+        historyManager.add(task);
+        List<Task> history = historyManager.getHistory();
+        assertEquals(1, history.size(), "История должна содержать одну задачу");
+        assertEquals(task.getId(), history.get(0).getId(), "Задача в истории должна совпадать по ID");
     }
 }
